@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Mispollos.Configuration;
 using Mispollos.DataAccess;
 using Mispollos.Entities;
+using Mispollos.Models;
 using MySql.Data.MySqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -60,12 +61,16 @@ namespace Mispollos.Controllers
 
         // POST api/<UserController>/authenticate
         [HttpPost("authenticate")]
-        public IActionResult Authenticate(string email, string password)
+        public IActionResult Authenticate(Authenticate model)
         {
-            var user = _context.Usuarios.FirstOrDefault(x => x.Correo == email && x.Clave == password);
+            var user = _context.Usuarios.FirstOrDefault(x => x.Correo == model.Email && x.Clave == model.Password);
+
+            Console.WriteLine(user);
 
             if (user == null)
+            {
                 return BadRequest(new { message = "El correo o clave son incorrectos" });
+            }
 
             #region Login Jwt
 

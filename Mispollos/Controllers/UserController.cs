@@ -53,6 +53,7 @@ namespace Mispollos.Controllers
         public IActionResult Post([FromBody] Usuario usuario)
         {
             usuario.IdRol = _appSettings.IdRolAdmin;
+            usuario.Clave = StringExtension.HashPassword(usuario.Clave);
             var result = _context.Usuarios.Add(usuario);
             _context.SaveChanges();
 
@@ -63,6 +64,8 @@ namespace Mispollos.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate(Authenticate model)
         {
+            model.Password = StringExtension.HashPassword(model.Password);
+
             var user = _context.Usuarios.FirstOrDefault(x => x.Correo == model.Email && x.Clave == model.Password);
 
             Console.WriteLine(user);

@@ -10,6 +10,11 @@ namespace Mispollos.Entities
     [Table("Producto")]//Atributos para que lo mapee en la base de datos
     public class Producto
     {
+        public Producto()
+        {
+            PedidoProducto = new HashSet<PedidoProducto>();
+        }
+
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -28,9 +33,10 @@ namespace Mispollos.Entities
         public string Descripcion { get; set; }
         public int Stock { get; set; }
         public string FechaVencimiento { get; set; }
-        public string Precio { get; set; }
-
+        public decimal Precio { get; set; }
+        public Tienda Tienda { get; set; }
         public Categoria Categoria { get; set; }//Esto es una propiedad de navegacion
         public Proveedor Proveedor { get; set; }
+        public virtual ICollection<PedidoProducto> PedidoProducto { get; set; }
     }
 }

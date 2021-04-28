@@ -13,7 +13,12 @@ namespace Mispollos.DataAccess
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Tienda> Tiendas { get; set; }
-        public DbSet<Rol> Roles { get; set; }
+        public DbSet<Categoria> Categoria { get; set; }
+        public DbSet<Producto> Producto { get; set; }
+        public DbSet<Proveedor> Proveedor { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<Pedido> Pedido { get; set; }
+        public DbSet<PedidoProducto> PedidoProducto { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,6 +43,8 @@ namespace Mispollos.DataAccess
             );
 
             #endregion ModuleSeed
+
+            modelBuilder.Entity<PedidoProducto>().HasKey(x => new { x.IdPedido, x.IdProducto });
         }
     }
 }

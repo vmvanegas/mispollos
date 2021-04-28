@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 
 namespace Mispollos.Entities
 {
-    [Table("Proveedor")]
-    public class Proveedor
+    [Table("Cliente")]
+    public class Cliente
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public string Nombre { get; set; }
+        [ForeignKey("Tienda")]
+        public Guid IdTienda { get; set; }
 
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
         public string Telefono { get; set; }
+        public Tienda Tienda { get; set; }
     }
 }

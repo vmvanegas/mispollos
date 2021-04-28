@@ -17,5 +17,7 @@ namespace Mispollos.Entities
         public Guid IdTienda { get; set; }
 
         public string Nombre { get; set; }
+
+        public Tienda Tienda { get; set; }
     }
 }

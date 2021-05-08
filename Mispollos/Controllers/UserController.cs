@@ -52,12 +52,20 @@ namespace Mispollos.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Usuario usuario)
         {
-            usuario.IdRol = _appSettings.IdRolAdmin;
-            usuario.Clave = StringExtension.HashPassword(usuario.Clave);
-            var result = _context.Usuarios.Add(usuario);
-            _context.SaveChanges();
+            var userWithSameEmail = _context.Usuarios.FirstOrDefault(x => x.Correo == usuario.Correo);
 
-            return Created("", result.Entity);
+            if (userWithSameEmail == null)
+            {
+                usuario.IdRol = _appSettings.IdRolAdmin;
+                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+                var result = _context.Usuarios.Add(usuario);
+                _context.SaveChanges();
+                return Created("", result.Entity);
+            }
+            else
+            {
+                return BadRequest(new { message = "El correo ya esta en uso" });
+            }
         }
 
         // POST api/<UserController>/authenticate

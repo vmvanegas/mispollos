@@ -33,10 +33,10 @@ namespace Mispollos.Controllers
 
         // Metodo traer lista de usuarios
         // GET: api/<UserController>
-        [HttpGet]
-        public IEnumerable<Usuario> Get()
+        [HttpGet("p/{page}")]
+        public IActionResult Get(int page)
         {
-            return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).AsEnumerable();
+            return Ok(new { data = _context.Usuarios.Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Count() });
         }
 
         // Traer un usuario por id

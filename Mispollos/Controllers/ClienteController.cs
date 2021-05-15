@@ -22,10 +22,11 @@ namespace Mispollos.Controllers
 
         // Metodo traer lista de clientes
         // GET: api/<UserController>
-        [HttpGet]
-        public IEnumerable<Cliente> Get()
+
+        [HttpGet("p/{page}")]
+        public IActionResult Get(int page)
         {
-            return _context.Cliente.AsEnumerable();
+            return Ok(new { data = _context.Cliente.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Cliente.Count() });
         }
 
         // Traer un cliente por id

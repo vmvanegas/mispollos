@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mispollos.DataAccess;
@@ -14,33 +13,33 @@ namespace Mispollos.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    public class CategoriaController : ControllerBase
+    public class PedidoController : ControllerBase
     {
         private readonly MisPollosContext _context = new MisPollosContext();
 
         // Metodo traer lista de usuarios
         // GET: api/<UserController>
+
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Categoria.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Categoria.Count() });
+            return Ok(new { data = _context.Pedido.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Pedido.Count() });
         }
 
         // Traer un usuario por id
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public Categoria Get(Guid id)
+        public Pedido Get(Guid id)
         {
-            return _context.Categoria.FirstOrDefault(x => x.Id == id);
+            return _context.Pedido.FirstOrDefault(x => x.Id == id);
         }
 
         // Crear usuario
         // POST api/<UserController>
         [HttpPost]
-        public IActionResult Post([FromBody] Categoria categoria)
+        public IActionResult Post([FromBody] Pedido pedido)
         {
-            var result = _context.Categoria.Add(categoria);
+            var result = _context.Pedido.Add(pedido);
             _context.SaveChanges();
 
             return Created("", result.Entity);
@@ -49,10 +48,10 @@ namespace Mispollos.Controllers
         // Actualizar usuario
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Categoria categoria)
+        public IActionResult Put(Pedido pedido)
         {
-            var result = _context.Categoria.Attach(categoria);
-            _context.Entry(categoria).State = EntityState.Modified;
+            var result = _context.Pedido.Attach(pedido);
+            _context.Entry(pedido).State = EntityState.Modified;
             _context.SaveChanges();
 
             return Ok(result.Entity);
@@ -63,12 +62,12 @@ namespace Mispollos.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
-            var categoria = _context.Categoria.FirstOrDefault(x => x.Id == id);
-            if (_context.Entry(categoria).State == EntityState.Detached)
+            var pedido = _context.Pedido.FirstOrDefault(x => x.Id == id);
+            if (_context.Entry(pedido).State == EntityState.Detached)
             {
-                _context.Categoria.Attach(categoria);
+                _context.Pedido.Attach(pedido);
             }
-            _context.Categoria.Remove(categoria);
+            _context.Pedido.Remove(pedido);
             _context.SaveChanges();
         }
     }

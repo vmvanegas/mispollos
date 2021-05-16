@@ -108,6 +108,7 @@ namespace Mispollos.Controllers
                 Nombre = user.Nombre,
                 Apellido = user.Apellido,
                 Correo = user.Correo,
+                IdTienda = user.IdTienda,
                 Token = tokenString
             });
         }

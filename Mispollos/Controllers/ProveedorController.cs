@@ -21,24 +21,32 @@ namespace Mispollos.Controllers
     {
         private readonly MisPollosContext _context = new MisPollosContext();
 
-        // Metodo traer lista de usuarios
-        // GET: api/<UserController>/1
+        // Metodo traer lista de proveedores
+
+        // GET: api/<ProveedorController>
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(new { data = _context.Proveedor.AsEnumerable() });
+        }
+
+        // GET: api/<ProveedorController>/1
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
             return Ok(new { data = _context.Proveedor.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Proveedor.Count() });
         }
 
-        // Traer un usuario por id
-        // GET api/<UserController>/5
+        // Traer un proveedor por id
+        // GET api/<ProveedorController>/5
         [HttpGet("{id}")]
         public Proveedor Get(Guid id)
         {
             return _context.Proveedor.FirstOrDefault(x => x.Id == id);
         }
 
-        // Crear usuario
-        // POST api/<UserController>
+        // Crear proveedor
+        // POST api/<ProveedorController>
         [HttpPost]
         public IActionResult Post([FromBody] Proveedor proveedor)
         {
@@ -48,8 +56,8 @@ namespace Mispollos.Controllers
             return Created("", result.Entity);
         }
 
-        // Actualizar usuario
-        // PUT api/<UserController>/5
+        // Actualizar proveedor
+        // PUT api/<ProveedorController>/5
         [HttpPut("{id}")]
         public IActionResult Put(Proveedor proveedor)
         {
@@ -60,8 +68,8 @@ namespace Mispollos.Controllers
             return Ok(result.Entity);
         }
 
-        // Borrar usuario
-        // DELETE api/<UserController>/5
+        // Borrar proveedor
+        // DELETE api/<ProveedorController>/5
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {

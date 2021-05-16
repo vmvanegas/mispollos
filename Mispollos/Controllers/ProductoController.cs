@@ -25,7 +25,7 @@ namespace Mispollos.Controllers
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Producto.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Producto.Count() });
+            return Ok(new { data = _context.Producto.Skip((page - 1) * 10).Include(x => x.Proveedor).Include(x => x.Categoria).Take(10).AsEnumerable(), total = _context.Producto.Count() });
         }
 
         // Traer un usuario por id
@@ -33,7 +33,7 @@ namespace Mispollos.Controllers
         [HttpGet("{id}")]
         public Producto Get(Guid id)
         {
-            return _context.Producto.FirstOrDefault(x => x.Id == id);
+            return _context.Producto.Include(x => x.Proveedor).Include(x => x.Categoria).FirstOrDefault(x => x.Id == id);
         }
 
         // Crear usuario

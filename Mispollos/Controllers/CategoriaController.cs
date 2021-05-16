@@ -19,24 +19,32 @@ namespace Mispollos.Controllers
     {
         private readonly MisPollosContext _context = new MisPollosContext();
 
-        // Metodo traer lista de usuarios
-        // GET: api/<UserController>
+        // Metodo traer lista de categorias
+
+        // GET: api/<CateogoriaController>
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(new { data = _context.Categoria.AsEnumerable() });
+        }
+
+        // GET: api/<CateogoriaController>/p/pagina
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
             return Ok(new { data = _context.Categoria.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Categoria.Count() });
         }
 
-        // Traer un usuario por id
-        // GET api/<UserController>/5
+        // Traer un categoria por id
+        // GET api/<CateogoriaController>/5
         [HttpGet("{id}")]
         public Categoria Get(Guid id)
         {
             return _context.Categoria.FirstOrDefault(x => x.Id == id);
         }
 
-        // Crear usuario
-        // POST api/<UserController>
+        // Crear categoria
+        // POST api/<CateogoriaController>
         [HttpPost]
         public IActionResult Post([FromBody] Categoria categoria)
         {
@@ -46,8 +54,8 @@ namespace Mispollos.Controllers
             return Created("", result.Entity);
         }
 
-        // Actualizar usuario
-        // PUT api/<UserController>/5
+        // Actualizar categoria
+        // PUT api/<CateogoriaController>/5
         [HttpPut("{id}")]
         public IActionResult Put(Categoria categoria)
         {
@@ -58,8 +66,8 @@ namespace Mispollos.Controllers
             return Ok(result.Entity);
         }
 
-        // Borrar usuario
-        // DELETE api/<UserController>/5
+        // Borrar categoria
+        // DELETE api/<CateogoriaController>/5
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {

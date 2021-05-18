@@ -40,9 +40,9 @@ namespace Mispollos.Controllers
         // Crear cliente
         // POST api/<ClienteController>
         [HttpPost]
-        public IActionResult Post([FromBody] Usuario usuario)
+        public IActionResult Post([FromBody] Cliente cliente)
         {
-            var result = _context.Usuarios.Add(usuario);
+            var result = _context.Cliente.Add(cliente);
             _context.SaveChanges();
 
             return Created("", result.Entity);

@@ -23,7 +23,7 @@ namespace Mispollos.Controllers
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Pedido.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Pedido.Count() });
+            return Ok(new { data = _context.Pedido.Include(x => x.Cliente).Include(x => x.Usuario).Include(x => x.PedidoProducto).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Pedido.Count() });
         }
 
         // Traer un usuario por id

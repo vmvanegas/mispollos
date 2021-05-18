@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -36,7 +37,7 @@ namespace Mispollos.Controllers
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Usuarios.Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Count() });
+            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Count() });
         }
 
         // Traer un usuario por id
@@ -68,13 +69,34 @@ namespace Mispollos.Controllers
             }
         }
 
+        // POST api/<UserController>/empleado
+        [Authorize(Roles = Role.Admin)]
+        [HttpPost("empleado")]
+        public IActionResult PostEmpleado([FromBody] Usuario usuario)
+        {
+            var userWithSameEmail = _context.Usuarios.FirstOrDefault(x => x.Correo == usuario.Correo);
+
+            if (userWithSameEmail == null)
+            {
+                usuario.IdRol = _appSettings.IdRolUser;
+                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+                var result = _context.Usuarios.Add(usuario);
+                _context.SaveChanges();
+                return Created("", result.Entity);
+            }
+            else
+            {
+                return BadRequest(new { message = "El correo ya esta en uso" });
+            }
+        }
+
         // POST api/<UserController>/authenticate
         [HttpPost("authenticate")]
         public IActionResult Authenticate(Authenticate model)
         {
             model.Password = StringExtension.HashPassword(model.Password);
 
-            var user = _context.Usuarios.FirstOrDefault(x => x.Correo == model.Email && x.Clave == model.Password);
+            var user = _context.Usuarios.Include(x => x.Rol).FirstOrDefault(x => x.Correo == model.Email && x.Clave == model.Password);
 
             Console.WriteLine(user);
 
@@ -91,7 +113,8 @@ namespace Mispollos.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Rol.Nombre)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

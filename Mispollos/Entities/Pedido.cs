@@ -13,13 +13,15 @@ namespace Mispollos.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        // Crear modelo con esta propiedad
         [ForeignKey("Usuario")]
         public Guid IdUsuario { get; set; }
 
+        // Crear modelo con esta propiedad
         [ForeignKey("Cliente")]
         public Guid IdCliente { get; set; }
 
-        public string Fecha { get; set; }
+        public DateTime Fecha { get; set; } = DateTime.Now;
         public decimal ValorTotal { get; set; }
         public Usuario Usuario { get; set; }
         public Cliente Cliente { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mispollos.DataAccess;
 using Mispollos.Entities;
+using Mispollos.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -37,10 +38,43 @@ namespace Mispollos.Controllers
         // Crear usuario
         // POST api/<UserController>
         [HttpPost]
-        public IActionResult Post([FromBody] Pedido pedido)
+        public IActionResult Post([FromBody] PedidoDto dto)
         {
+            // Consulta los id de producto enviados por el frontend
+            var products = _context.Producto.Where(x => dto.ListaProductos.Select(s => s.IdProducto).Contains(x.Id));
+            decimal total = 0;
+
+            // Calcula el valor total del pedido multiplicando el precio de cada producto por su cantidad y sumandolo
+            foreach (var producto in products)
+            {
+                var cantidad = dto.ListaProductos.First(x => x.IdProducto == producto.Id).Cantidad;
+                total += cantidad * producto.Precio;
+            }
+
+            var pedido = new Pedido
+            {
+                IdCliente = dto.IdCliente,
+                IdUsuario = dto.IdUsuario,
+                ValorTotal = total
+            };
+
             var result = _context.Pedido.Add(pedido);
             _context.SaveChanges();
+
+            foreach (var item in dto.ListaProductos)
+            {
+                decimal precio = _context.Producto.First(x => x.Id == item.IdProducto).Precio;
+
+                var productItem = new PedidoProducto
+                {
+                    IdPedido = result.Entity.Id,
+                    IdProducto = item.IdProducto,
+                    Cantidad = item.Cantidad,
+                    ValorTotal = item.Cantidad * precio
+                };
+                var iresult = _context.PedidoProducto.Add(productItem);
+                _context.SaveChanges();
+            }
 
             return Created("", result.Entity);
         }

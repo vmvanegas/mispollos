@@ -21,7 +21,15 @@ namespace Mispollos.Controllers
         private readonly MisPollosContext _context = new MisPollosContext();
 
         // Metodo traer lista de clientes
-        // GET: api/<UserController>
+
+        // GET: api/<ClienteController>
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(new { data = _context.Cliente.AsEnumerable() });
+        }
+
+        // GET: api/<ClienteController>/p/{page}
 
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)

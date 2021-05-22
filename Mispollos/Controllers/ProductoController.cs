@@ -20,7 +20,15 @@ namespace Mispollos.Controllers
         private readonly MisPollosContext _context = new MisPollosContext();
 
         // Metodo traer lista de usuarios
-        // GET: api/<UserController>
+
+        // GET: api/<ProductoController>
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(new { data = _context.Producto.AsEnumerable() });
+        }
+
+        // GET: api/<ProductoController>/p/{page}
 
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
@@ -29,7 +37,7 @@ namespace Mispollos.Controllers
         }
 
         // Traer un usuario por id
-        // GET api/<UserController>/5
+        // GET api/<ProductoController>/5
         [HttpGet("{id}")]
         public Producto Get(Guid id)
         {
@@ -37,7 +45,7 @@ namespace Mispollos.Controllers
         }
 
         // Crear usuario
-        // POST api/<UserController>
+        // POST api/<ProductoController>
         [HttpPost]
         public IActionResult Post([FromBody] Producto producto)
         {
@@ -48,7 +56,7 @@ namespace Mispollos.Controllers
         }
 
         // Actualizar usuario
-        // PUT api/<UserController>/5
+        // PUT api/<ProductoController>/5
         [HttpPut("{id}")]
         public IActionResult Put(Producto producto)
         {
@@ -60,7 +68,7 @@ namespace Mispollos.Controllers
         }
 
         // Borrar usuario
-        // DELETE api/<UserController>/5
+        // DELETE api/<ProductoController>/5
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {

@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Mispollos.Models
+{
+    public class PedidoDto
+    {
+        public Guid IdUsuario { get; set; }
+        public Guid IdCliente { get; set; }
+        public List<ProductoDto> ListaProductos { get; set; }
+    }
+
+    public class ProductoDto
+    {
+        public Guid IdProducto { get; set; }
+
+        public int Cantidad { get; set; }
+    }
+}

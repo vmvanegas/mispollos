@@ -36,7 +36,7 @@ namespace Mispollos.Controllers
         }
 
         // Traer un categoria por id
-        // GET api/<CateogoriaController>/5
+        // GET api/<CateogoriaController>/{id}
         [HttpGet("{id}")]
         public Categoria Get(Guid id)
         {
@@ -55,7 +55,7 @@ namespace Mispollos.Controllers
         }
 
         // Actualizar categoria
-        // PUT api/<CateogoriaController>/5
+        // PUT api/<CateogoriaController>/{id}
         [HttpPut("{id}")]
         public IActionResult Put(Categoria categoria)
         {
@@ -67,7 +67,7 @@ namespace Mispollos.Controllers
         }
 
         // Borrar categoria
-        // DELETE api/<CateogoriaController>/5
+        // DELETE api/<CateogoriaController>/{id}
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {

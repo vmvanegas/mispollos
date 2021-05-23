@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Mispollos.Configuration;
 using Mispollos.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,16 @@ namespace Mispollos.DataAccess
     public class MisPollosContext : DbContext
     {
         private const string _connectionString = @"Server=.;Database=mispollos;Trusted_Connection=True;";
+        private AppSettings _appSettings;
+
+        public MisPollosContext()
+        {
+        }
+
+        public MisPollosContext(IOptions<AppSettings> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Tienda> Tiendas { get; set; }

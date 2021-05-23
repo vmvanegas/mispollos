@@ -63,16 +63,22 @@ namespace Mispollos.Controllers
 
             foreach (var item in dto.ListaProductos)
             {
-                decimal precio = _context.Producto.First(x => x.Id == item.IdProducto).Precio;
+                Producto producto = _context.Producto.First(x => x.Id == item.IdProducto);
+
+                producto.Stock -= item.Cantidad;
+                _context.Producto.Attach(producto);
+                _context.Entry(producto).State = EntityState.Modified;
+                _context.SaveChanges();
 
                 var productItem = new PedidoProducto
                 {
                     IdPedido = result.Entity.Id,
                     IdProducto = item.IdProducto,
                     Cantidad = item.Cantidad,
-                    ValorTotal = item.Cantidad * precio
+                    ValorTotal = item.Cantidad * producto.Precio
                 };
-                var iresult = _context.PedidoProducto.Add(productItem);
+
+                _context.PedidoProducto.Add(productItem);
                 _context.SaveChanges();
             }
 

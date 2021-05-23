@@ -49,7 +49,7 @@ namespace Mispollos.Controllers
         }
 
         // Crear usuario
-        // POST api/<UserController>
+        // POST api/user
         [HttpPost]
         public IActionResult Post([FromBody] Usuario usuario)
         {
@@ -90,7 +90,7 @@ namespace Mispollos.Controllers
             }
         }
 
-        // POST api/<UserController>/authenticate
+        // POST api/user/authenticate
         [HttpPost("authenticate")]
         public IActionResult Authenticate(Authenticate model)
         {

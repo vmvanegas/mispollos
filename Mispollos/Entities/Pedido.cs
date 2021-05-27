@@ -10,6 +10,11 @@ namespace Mispollos.Entities
     [Table("Pedido")]
     public class Pedido
     {
+        public Pedido()
+        {
+            PedidoProducto = new HashSet<PedidoProducto>();
+        }
+
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -25,6 +30,6 @@ namespace Mispollos.Entities
         public decimal ValorTotal { get; set; }
         public Usuario Usuario { get; set; }
         public Cliente Cliente { get; set; }
-        public IList<PedidoProducto> PedidoProducto { get; set; }
+        public ICollection<PedidoProducto> PedidoProducto { get; set; }
     }
 }

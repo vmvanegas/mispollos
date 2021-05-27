@@ -7,6 +7,7 @@ namespace Mispollos.Models
 {
     public class PedidoDto
     {
+        public Guid Id { get; set; } = Guid.Empty;
         public Guid IdUsuario { get; set; }
         public Guid IdCliente { get; set; }
         public List<ProductoDto> ListaProductos { get; set; }

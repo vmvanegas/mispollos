@@ -97,9 +97,9 @@ namespace Mispollos.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(PedidoDto dto)
         {
+            decimal total = 0;
             // Consulta los id de producto enviados por el frontend
             var products = _context.Producto.Where(x => dto.ListaProductos.Select(s => s.IdProducto).Contains(x.Id));
-            decimal total = 0;
 
             // Calcula el valor total del pedido multiplicando el precio de cada producto por su cantidad y sumandolo
             foreach (var producto in products)
@@ -125,7 +125,11 @@ namespace Mispollos.Controllers
             foreach (var productItem in productItems)
             {
                 if (!dto.ListaProductos.Any(x => x.IdProducto == productItem.IdProducto))
+                {
+                    /* Producto product = _context.Producto.First(x => x.Id == productItem.IdProducto);
+                    product.Stock += productItem.Cantidad; */
                     _context.PedidoProducto.Remove(productItem);
+                }
             }
             _context.SaveChanges();
 
@@ -140,7 +144,6 @@ namespace Mispollos.Controllers
                 _context.Entry(producto).State = EntityState.Modified;
                 _context.SaveChanges();
 
-                //Pedido pedidoProducto = _context.Pedido.Include(x => x.PedidoProducto).Where(x => x.Id == dto.Id);
                 var pedidoProducto = productItems.FirstOrDefault(x => x.IdProducto == item.IdProducto);
                 if (pedidoProducto == null)
                 {
@@ -162,9 +165,6 @@ namespace Mispollos.Controllers
                     _context.Entry(pedidoProducto).State = EntityState.Modified;
                     _context.SaveChanges();
                 }
-                /*
-                var leftProduct = _context.PedidoProducto.FirstOrDefault(x => x.IdPedido == dto.Id && x.IdProducto != item.IdProducto);
-                _context.SaveChanges();*/
             }
 
             return Ok(result.Entity);

@@ -51,7 +51,7 @@ namespace Mispollos.Controllers
         [HttpGet("{id}")]
         public Usuario Get(Guid id)
         {
-            return _context.Usuarios.FirstOrDefault(x => x.Id == id);
+            return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).FirstOrDefault(x => x.Id == id);
         }
 
         // Crear usuario

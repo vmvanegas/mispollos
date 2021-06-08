@@ -14,6 +14,7 @@ using Mispollos.Configuration;
 using Mispollos.DataAccess;
 using Mispollos.Entities;
 using Mispollos.Models;
+using Mispollos.Utils;
 using MySql.Data.MySqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -85,9 +86,12 @@ namespace Mispollos.Controllers
             if (userWithSameEmail == null)
             {
                 usuario.IdRol = _appSettings.IdRolUser;
-                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+                string password = usuario.Clave;
+                usuario.Clave = StringExtension.HashPassword(password);
                 var result = _context.Usuarios.Add(usuario);
                 _context.SaveChanges();
+
+                Email.send(usuario.Correo, password);
                 return Created("", result.Entity);
             }
             else
@@ -148,6 +152,18 @@ namespace Mispollos.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(Usuario usuario)
         {
+            if (usuario.Clave != "")
+            {
+                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+            }
+            else
+            {
+                using (MisPollosContext context = new MisPollosContext())
+                {
+                    usuario.Clave = context.Usuarios.FirstOrDefault(x => x.Id == usuario.Id).Clave;
+                }
+            }
+
             var result = _context.Usuarios.Attach(usuario);
             _context.Entry(usuario).State = EntityState.Modified;
             _context.SaveChanges();

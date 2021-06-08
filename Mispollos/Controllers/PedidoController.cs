@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Mispollos.DataAccess;
 using Mispollos.Entities;
 using Mispollos.Models;
+using Mispollos.Utils;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -126,8 +127,12 @@ namespace Mispollos.Controllers
             {
                 if (!dto.ListaProductos.Any(x => x.IdProducto == productItem.IdProducto))
                 {
-                    /* Producto product = _context.Producto.First(x => x.Id == productItem.IdProducto);
-                    product.Stock += productItem.Cantidad; */
+                    using (MisPollosContext context = new MisPollosContext())
+                    {
+                        Producto product = context.Producto.First(x => x.Id == productItem.IdProducto);
+                        product.Stock += productItem.Cantidad;
+                        context.SaveChanges();
+                    }
                     _context.PedidoProducto.Remove(productItem);
                 }
             }

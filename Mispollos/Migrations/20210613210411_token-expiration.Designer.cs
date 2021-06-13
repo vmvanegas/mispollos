@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mispollos.DataAccess;
 
 namespace Mispollos.Migrations
 {
     [DbContext(typeof(MisPollosContext))]
-    partial class MisPollosContextModelSnapshot : ModelSnapshot
+    [Migration("20210613210411_token-expiration")]
+    partial class tokenexpiration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

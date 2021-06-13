@@ -9,7 +9,7 @@ namespace Mispollos.Utils
 {
     public class Email
     {
-        public static void send(string emailDestino, string generatedPassword)
+        public static void send(string emailDestino, Guid token)
         {
             string emailOrigen = "mispollos.oficial@gmail.com";
             string password = "mi$po11o$";
@@ -18,7 +18,7 @@ namespace Mispollos.Utils
             using (StreamReader reader = File.OpenText("html\\generatedPasswordEmail.html"))
             {
                 body = reader.ReadToEnd();
-                body = body.Replace("{{EMAIL}}", emailDestino).Replace("{{PASSWORD}}", generatedPassword);
+                body = body.Replace("{{EMAIL}}", emailDestino).Replace("{{TOKEN}}", token.ToString());
             }
 
             MailMessage mailMessage = new MailMessage(emailOrigen, emailDestino, "Test de email de creacion de cuenta de empleado de Mispollos", body);

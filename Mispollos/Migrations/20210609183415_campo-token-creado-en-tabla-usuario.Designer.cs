@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mispollos.DataAccess;
 
 namespace Mispollos.Migrations
 {
     [DbContext(typeof(MisPollosContext))]
-    partial class MisPollosContextModelSnapshot : ModelSnapshot
+    [Migration("20210609183415_campo-token-creado-en-tabla-usuario")]
+    partial class campotokencreadoentablausuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,17 +27,11 @@ namespace Mispollos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("IdTienda")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -53,9 +49,6 @@ namespace Mispollos.Migrations
                     b.Property<string>("Apellido")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("IdTienda")
                         .HasColumnType("uniqueidentifier");
 
@@ -64,9 +57,6 @@ namespace Mispollos.Migrations
 
                     b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -81,9 +71,6 @@ namespace Mispollos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
@@ -92,9 +79,6 @@ namespace Mispollos.Migrations
 
                     b.Property<Guid>("IdUsuario")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("ValorTotal")
                         .HasColumnType("decimal(18,2)");
@@ -119,12 +103,6 @@ namespace Mispollos.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("ValorTotal")
                         .HasColumnType("decimal(18,2)");
 
@@ -140,9 +118,6 @@ namespace Mispollos.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
@@ -168,9 +143,6 @@ namespace Mispollos.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdCategoria");
@@ -188,17 +160,11 @@ namespace Mispollos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -211,14 +177,8 @@ namespace Mispollos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -227,17 +187,13 @@ namespace Mispollos.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("257342d8-26a0-4719-9a31-6f5dae6838e5"),
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Nombre = "Admin",
-                            UpdatedOn = new DateTime(2021, 6, 13, 16, 4, 10, 929, DateTimeKind.Local).AddTicks(5635)
+                            Id = new Guid("140ad4e8-8587-4897-9c02-82a21efbb73d"),
+                            Nombre = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("170689bd-1c51-4b48-ade2-12373c8a4d88"),
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Nombre = "Usuario",
-                            UpdatedOn = new DateTime(2021, 6, 13, 16, 4, 10, 930, DateTimeKind.Local).AddTicks(2970)
+                            Id = new Guid("348abac7-6b6a-4270-ae69-5caad61c4e9a"),
+                            Nombre = "Usuario"
                         });
                 });
 
@@ -247,9 +203,6 @@ namespace Mispollos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Direccion")
                         .HasColumnType("nvarchar(max)");
 
@@ -258,9 +211,6 @@ namespace Mispollos.Migrations
 
                     b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -282,9 +232,6 @@ namespace Mispollos.Migrations
                     b.Property<string>("Correo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("IdRol")
                         .HasColumnType("uniqueidentifier");
 
@@ -296,12 +243,6 @@ namespace Mispollos.Migrations
 
                     b.Property<Guid>("Token")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("TokenExpiration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

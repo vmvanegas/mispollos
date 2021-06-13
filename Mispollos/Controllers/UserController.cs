@@ -55,6 +55,14 @@ namespace Mispollos.Controllers
             return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).FirstOrDefault(x => x.Id == id);
         }
 
+        // Traer un usuario por token
+        // GET api/<UserController>/5
+        [HttpGet("recuperar-clave/{token}")]
+        public Usuario GetByToken(Guid token)
+        {
+            return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).FirstOrDefault(x => x.Token == token);
+        }
+
         // Crear usuario
         // POST api/user
         [HttpPost]
@@ -86,12 +94,14 @@ namespace Mispollos.Controllers
             if (userWithSameEmail == null)
             {
                 usuario.IdRol = _appSettings.IdRolUser;
-                string password = usuario.Clave;
-                usuario.Clave = StringExtension.HashPassword(password);
+                Guid token = Guid.NewGuid();
+                usuario.TokenExpiration = DateTime.Now.AddDays(1);
+                usuario.Token = token;
+                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
                 var result = _context.Usuarios.Add(usuario);
                 _context.SaveChanges();
 
-                Email.send(usuario.Correo, password);
+                Email.send(usuario.Correo, token);
                 return Created("", result.Entity);
             }
             else

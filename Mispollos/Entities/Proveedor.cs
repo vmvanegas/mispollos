@@ -16,5 +16,7 @@ namespace Mispollos.Entities
         public string Nombre { get; set; }
 
         public string Telefono { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
     }
 }

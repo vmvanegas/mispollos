@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mispollos.DataAccess;
 
 namespace Mispollos.Migrations
 {
     [DbContext(typeof(MisPollosContext))]
-    partial class MisPollosContextModelSnapshot : ModelSnapshot
+    [Migration("20210612172233_fechas-agregadas-a-todas-las-tablas")]
+    partial class fechasagregadasatodaslastablas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,17 +229,17 @@ namespace Mispollos.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("257342d8-26a0-4719-9a31-6f5dae6838e5"),
+                            Id = new Guid("54c469d4-9b82-49cb-b815-09d877d56de0"),
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Admin",
-                            UpdatedOn = new DateTime(2021, 6, 13, 16, 4, 10, 929, DateTimeKind.Local).AddTicks(5635)
+                            UpdatedOn = new DateTime(2021, 6, 12, 12, 22, 32, 789, DateTimeKind.Local).AddTicks(1389)
                         },
                         new
                         {
-                            Id = new Guid("170689bd-1c51-4b48-ade2-12373c8a4d88"),
+                            Id = new Guid("4d0a1448-6794-4f36-bef6-c44917bccac5"),
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Usuario",
-                            UpdatedOn = new DateTime(2021, 6, 13, 16, 4, 10, 930, DateTimeKind.Local).AddTicks(2970)
+                            UpdatedOn = new DateTime(2021, 6, 12, 12, 22, 32, 789, DateTimeKind.Local).AddTicks(8446)
                         });
                 });
 
@@ -296,9 +298,6 @@ namespace Mispollos.Migrations
 
                     b.Property<Guid>("Token")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("TokenExpiration")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");

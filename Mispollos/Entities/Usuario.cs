@@ -28,7 +28,10 @@ namespace Mispollos.Entities
         public string Apellido { get; set; }
         public string Correo { get; set; }
         public string Clave { get; set; }
-
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+        public Guid Token { get; set; }
+        public DateTime TokenExpiration { get; set; }
         public Rol Rol { get; set; }//Esto es una propiedad de navegacion
         public Tienda Tienda { get; set; }
 

@@ -86,8 +86,6 @@ namespace Mispollos
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
-            services.AddTransient<MisPollosContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

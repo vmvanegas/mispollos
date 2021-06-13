@@ -18,6 +18,9 @@ namespace Mispollos.Entities
 
         public string Nombre { get; set; }
 
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+
         public Tienda Tienda { get; set; }
     }
 }

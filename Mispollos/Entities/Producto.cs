@@ -34,7 +34,7 @@ namespace Mispollos.Entities
         public int Stock { get; set; }
         public DateTime FechaVencimiento { get; set; }
         public decimal Precio { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
         public Tienda Tienda { get; set; }
         public Categoria Categoria { get; set; }//Esto es una propiedad de navegacion

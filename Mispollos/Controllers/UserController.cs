@@ -37,14 +37,14 @@ namespace Mispollos.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { data = _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).AsEnumerable() });
+            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).OrderByDescending(x => x.UpdatedOn).Include(x => x.Tienda).Include(x => x.Rol).AsEnumerable() });
         }
 
         // GET: api/<UserController>
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Count() });
+            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Count() });
         }
 
         // Traer un usuario por id
@@ -74,6 +74,7 @@ namespace Mispollos.Controllers
             {
                 usuario.IdRol = _appSettings.IdRolAdmin;
                 usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+                usuario.CreatedOn = DateTime.Now;
                 var result = _context.Usuarios.Add(usuario);
                 _context.SaveChanges();
                 return Created("", result.Entity);
@@ -98,16 +99,36 @@ namespace Mispollos.Controllers
                 usuario.TokenExpiration = DateTime.Now.AddDays(1);
                 usuario.Token = token;
                 usuario.Clave = StringExtension.HashPassword(usuario.Clave);
+                usuario.CreatedOn = DateTime.Now;
                 var result = _context.Usuarios.Add(usuario);
                 _context.SaveChanges();
 
-                Email.send(usuario.Correo, token);
+                Email.send(usuario.Correo, token, "generatedPasswordEmail", "Tu cuenta en Mispollos ha sido creada");
                 return Created("", result.Entity);
             }
             else
             {
                 return BadRequest(new { message = "El correo ya esta en uso" });
             }
+        }
+
+        // POST api/user/recuperar-cuenta
+        [HttpPost("recuperar-cuenta")]
+        public IActionResult PostRecuperarCuenta([FromBody] RecoverPasswordEmail email)
+        {
+            var user = _context.Usuarios.FirstOrDefault(x => x.Correo == email.Email);
+            if (user != null)
+            {
+                user.TokenExpiration = DateTime.Now.AddDays(1);
+                user.Token = Guid.NewGuid();
+                var result = _context.Usuarios.Attach(user);
+                _context.Entry(user).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                Email.send(user.Correo, user.Token, "recoverPasswordEmail", "Solicitud de recuperacion de contraseña");
+                return Ok();
+            }
+            return BadRequest(new { message = "El correo no existe" });
         }
 
         // POST api/user/authenticate

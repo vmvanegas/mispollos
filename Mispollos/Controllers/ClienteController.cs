@@ -26,7 +26,7 @@ namespace Mispollos.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { data = _context.Cliente.AsEnumerable() });
+            return Ok(new { data = _context.Cliente.OrderBy(x => x.Nombre).AsEnumerable() });
         }
 
         // GET: api/<ClienteController>/p/{page}
@@ -34,7 +34,7 @@ namespace Mispollos.Controllers
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Cliente.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Cliente.Count() });
+            return Ok(new { data = _context.Cliente.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Cliente.Count() });
         }
 
         // Traer un cliente por id
@@ -50,6 +50,7 @@ namespace Mispollos.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Cliente cliente)
         {
+            cliente.CreatedOn = DateTime.Now;
             var result = _context.Cliente.Add(cliente);
             _context.SaveChanges();
 

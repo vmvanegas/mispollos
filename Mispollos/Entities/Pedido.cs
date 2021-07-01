@@ -28,7 +28,7 @@ namespace Mispollos.Entities
 
         public DateTime Fecha { get; set; } = DateTime.Now;
         public decimal ValorTotal { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
         public Usuario Usuario { get; set; }
         public Cliente Cliente { get; set; }

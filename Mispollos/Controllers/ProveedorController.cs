@@ -27,14 +27,19 @@ namespace Mispollos.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { data = _context.Proveedor.AsEnumerable() });
+            return Ok(new { data = _context.Proveedor.OrderBy(x => x.Nombre).AsEnumerable() });
         }
 
         // GET: api/<ProveedorController>/1
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public IActionResult Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Proveedor.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Proveedor.Count() });
+            if (search != null)
+            {
+                return Ok(new { data = _context.Proveedor.Where(x => x.Nombre.Contains(search)).OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Proveedor.Where(x=> x.Nombre.Contains(search)).Count() });
+            }
+
+            return Ok(new { data = _context.Proveedor.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Proveedor.Count() });
         }
 
         // Traer un proveedor por id
@@ -50,6 +55,7 @@ namespace Mispollos.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Proveedor proveedor)
         {
+            proveedor.CreatedOn = DateTime.Now;
             var result = _context.Proveedor.Add(proveedor);
             _context.SaveChanges();
 

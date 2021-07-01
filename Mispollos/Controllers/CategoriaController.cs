@@ -25,15 +25,22 @@ namespace Mispollos.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { data = _context.Categoria.AsEnumerable() });
+            return Ok(new { data = _context.Categoria.OrderBy(x => x.Nombre).AsEnumerable() });
         }
 
         // GET: api/<CateogoriaController>/p/pagina
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public IActionResult Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Categoria.Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Categoria.Count() });
+            if (search != null)
+            {
+                return Ok(new { data = _context.Categoria.Where(x => x.Nombre.Contains(search)).OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Categoria.Count() });
+            }
+
+            return Ok(new { data = _context.Categoria.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Categoria.Count() });
         }
+
+        // GET: api/categoria/search
 
         // Traer un categoria por id
         // GET api/<CateogoriaController>/{id}
@@ -48,6 +55,7 @@ namespace Mispollos.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Categoria categoria)
         {
+            categoria.CreatedOn = DateTime.Now;
             var result = _context.Categoria.Add(categoria);
             _context.SaveChanges();
 

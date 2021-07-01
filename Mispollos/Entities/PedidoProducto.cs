@@ -18,7 +18,7 @@ namespace Mispollos.Entities
 
         public int Cantidad { get; set; }
         public decimal ValorTotal { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
         public Pedido Pedido { get; set; }
         public Producto Producto { get; set; }

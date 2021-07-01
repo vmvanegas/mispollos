@@ -25,7 +25,7 @@ namespace Mispollos.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { data = _context.Producto.AsEnumerable() });
+            return Ok(new { data = _context.Producto.OrderBy(x => x.Nombre).AsEnumerable() });
         }
 
         // GET: api/<ProductoController>/p/{page}
@@ -33,7 +33,7 @@ namespace Mispollos.Controllers
         [HttpGet("p/{page}")]
         public IActionResult Get(int page)
         {
-            return Ok(new { data = _context.Producto.Skip((page - 1) * 10).Include(x => x.Proveedor).Include(x => x.Categoria).Take(10).AsEnumerable(), total = _context.Producto.Count() });
+            return Ok(new { data = _context.Producto.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Include(x => x.Proveedor).Include(x => x.Categoria).Take(10).AsEnumerable(), total = _context.Producto.Count() });
         }
 
         // Traer un usuario por id
@@ -49,6 +49,7 @@ namespace Mispollos.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Producto producto)
         {
+            producto.CreatedOn = DateTime.Now;
             var result = _context.Producto.Add(producto);
             _context.SaveChanges();
 

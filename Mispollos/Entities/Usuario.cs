@@ -28,7 +28,7 @@ namespace Mispollos.Entities
         public string Apellido { get; set; }
         public string Correo { get; set; }
         public string Clave { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
         public Guid Token { get; set; }
         public DateTime TokenExpiration { get; set; }

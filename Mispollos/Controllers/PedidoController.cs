@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mispollos.DataAccess;
-using Mispollos.Entities;
-using Mispollos.Models;
-using Mispollos.Utils;
+using Mispollos.Domain.Contracts.Services;
+using Mispollos.Domain.Entities;
+using Mispollos.Domain.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,83 +15,49 @@ namespace Mispollos.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PedidoController : ControllerBase
     {
-        private readonly MisPollosContext _context = new MisPollosContext();
+        private readonly IOrderService _service;
+
+        public PedidoController(IOrderService service)
+        {
+            _service = service;
+        }
 
         // Metodo traer lista de pedidos
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(new { data = _context.Pedido.Include(x => x.Cliente).Include(x => x.Usuario).Include(x => x.PedidoProducto).AsEnumerable() });
+            var result = await _service.GetOrders();
+            return Ok(result);
         }
 
         // GET: api/<PedidoController>
 
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public async Task<IActionResult> Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Pedido.OrderByDescending(x => x.UpdatedOn).Include(x => x.Cliente).Include(x => x.Usuario).Include(x => x.PedidoProducto).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Pedido.Count() });
+            var result = await _service.GetOrdersPaged(page, search);
+            return Ok(result);
         }
 
         // Traer un pedido por id
         // GET api/<PedidoController>/5
         [HttpGet("{id}")]
-        public Pedido Get(Guid id)
+        public async Task<Pedido> Get(Guid id)
         {
-            return _context.Pedido.Include(x => x.Cliente).Include(x => x.Usuario).Include(x => x.PedidoProducto).FirstOrDefault(x => x.Id == id);
+            return await _service.GetOrderById(id);
         }
 
         // Crear pedido
         // POST api/<PedidoController>
         [HttpPost]
-        public IActionResult Post([FromBody] PedidoDto dto)
+        public async Task<IActionResult> Post([FromBody] PedidoDto dto)
         {
-            // Consulta los id de producto enviados por el frontend
-            var products = _context.Producto.Where(x => dto.ListaProductos.Select(s => s.IdProducto).Contains(x.Id));
-            decimal total = 0;
-
-            // Calcula el valor total del pedido multiplicando el precio de cada producto por su cantidad y sumandolo
-            foreach (var producto in products)
-            {
-                var cantidad = dto.ListaProductos.First(x => x.IdProducto == producto.Id).Cantidad;
-                total += cantidad * producto.Precio;
-            }
-
-            var pedido = new Pedido
-            {
-                IdCliente = dto.IdCliente,
-                IdUsuario = dto.IdUsuario,
-                ValorTotal = total,
-                CreatedOn = DateTime.Now
-            };
-
-            var result = _context.Pedido.Add(pedido);
-            _context.SaveChanges();
-
-            foreach (var item in dto.ListaProductos)
-            {
-                Producto producto = _context.Producto.First(x => x.Id == item.IdProducto);
-
-                producto.Stock -= item.Cantidad;
-                _context.Producto.Attach(producto);
-                _context.Entry(producto).State = EntityState.Modified;
-                _context.SaveChanges();
-
-                var productItem = new PedidoProducto
-                {
-                    IdPedido = result.Entity.Id,
-                    IdProducto = item.IdProducto,
-                    Cantidad = item.Cantidad,
-                    ValorTotal = item.Cantidad * producto.Precio
-                };
-
-                _context.PedidoProducto.Add(productItem);
-                _context.SaveChanges();
-            }
-
-            return Created("", result.Entity);
+            var result = await _service.CreateOrder(dto);
+            return Ok(result);
         }
 
         // Actualizar pedido
@@ -99,81 +65,8 @@ namespace Mispollos.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(PedidoDto dto)
         {
-            decimal total = 0;
-            // Consulta los id de producto enviados por el frontend
-            var products = _context.Producto.Where(x => dto.ListaProductos.Select(s => s.IdProducto).Contains(x.Id));
-
-            // Calcula el valor total del pedido multiplicando el precio de cada producto por su cantidad y sumandolo
-            foreach (var producto in products)
-            {
-                var cantidad = dto.ListaProductos.First(x => x.IdProducto == producto.Id).Cantidad;
-                total += cantidad * producto.Precio;
-            }
-
-            var pedido = new Pedido
-            {
-                Id = dto.Id,
-                IdCliente = dto.IdCliente,
-                IdUsuario = dto.IdUsuario,
-                ValorTotal = total,
-            };
-
-            var result = _context.Pedido.Attach(pedido);
-            _context.Entry(pedido).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            var productItems = _context.PedidoProducto.Where(x => x.IdPedido == pedido.Id);
-
-            foreach (var productItem in productItems)
-            {
-                if (!dto.ListaProductos.Any(x => x.IdProducto == productItem.IdProducto))
-                {
-                    using (MisPollosContext context = new MisPollosContext())
-                    {
-                        Producto product = context.Producto.First(x => x.Id == productItem.IdProducto);
-                        product.Stock += productItem.Cantidad;
-                        context.SaveChanges();
-                    }
-                    _context.PedidoProducto.Remove(productItem);
-                }
-            }
-            _context.SaveChanges();
-
-            foreach (var item in dto.ListaProductos)
-            {
-                Producto producto = _context.Producto.First(x => x.Id == item.IdProducto);
-                var cantidad = productItems.FirstOrDefault(x => x.IdProducto == item.IdProducto)?.Cantidad ?? 0;
-                //                   5            10
-                producto.Stock += cantidad - item.Cantidad;
-                //                   10            5
-                _context.Producto.Attach(producto);
-                _context.Entry(producto).State = EntityState.Modified;
-                _context.SaveChanges();
-
-                var pedidoProducto = productItems.FirstOrDefault(x => x.IdProducto == item.IdProducto);
-                if (pedidoProducto == null)
-                {
-                    pedidoProducto = new PedidoProducto
-                    {
-                        IdPedido = pedido.Id,
-                        IdProducto = item.IdProducto,
-                        Cantidad = item.Cantidad,
-                        ValorTotal = item.Cantidad * producto.Precio
-                    };
-
-                    _context.PedidoProducto.Add(pedidoProducto);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    pedidoProducto.Cantidad = item.Cantidad;
-                    _context.PedidoProducto.Attach(pedidoProducto);
-                    _context.Entry(pedidoProducto).State = EntityState.Modified;
-                    _context.SaveChanges();
-                }
-            }
-
-            return Ok(result.Entity);
+            _service.UpdateOrder(dto);
+            return Ok();
         }
 
         // Borrar pedido
@@ -181,13 +74,7 @@ namespace Mispollos.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
-            var pedido = _context.Pedido.FirstOrDefault(x => x.Id == id);
-            if (_context.Entry(pedido).State == EntityState.Detached)
-            {
-                _context.Pedido.Attach(pedido);
-            }
-            _context.Pedido.Remove(pedido);
-            _context.SaveChanges();
+            _service.DeleteOrder(id);
         }
     }
 }

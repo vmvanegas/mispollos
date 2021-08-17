@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,8 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Mispollos.Configuration;
-using Mispollos.DataAccess;
+using Mispollos.Application;
+using Mispollos.Infrastructure.Configuration;
+using Mispollos.Persistence;
+using Newtonsoft.Json;
 
 namespace Mispollos
 {
@@ -25,12 +28,15 @@ namespace Mispollos
             Configuration = configuration;
         }
 
-        private readonly MisPollosContext _context = new MisPollosContext();
+        //private readonly MisPollosContext _context = new MisPollosContext();
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddPersistenceServices();
+            services.AddApplicationServices();
+
             services.AddCors();
 
             services.AddControllers();
@@ -53,17 +59,28 @@ namespace Mispollos
             {
                 x.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = context =>
+                    OnAuthenticationFailed = c =>
                     {
-                        var userId = Guid.Parse(context.Principal.Identity.Name);
-                        var user = _context.Usuarios.FirstOrDefault(x => x.Id == userId);
-                        if (user == null)
-                        {
-                            // return unauthorized if user no longer exists
-                            context.Fail("Unauthorized");
-                        }
-                        return Task.CompletedTask;
-                    }
+                        c.NoResult();
+                        c.Response.StatusCode = 500;
+                        c.Response.ContentType = "text/plain";
+                        return c.Response.WriteAsync(c.Exception.ToString());
+                    },
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        context.Response.ContentType = "application/json";
+                        var result = JsonConvert.SerializeObject("401 Not authorized");
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        context.Response.ContentType = "application/json";
+                        var result = JsonConvert.SerializeObject("403 Not authorized");
+                        return context.Response.WriteAsync(result);
+                    },
                 };
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
@@ -72,7 +89,8 @@ namespace Mispollos
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true
                 };
             });
 

@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Mispollos.Application.Services;
 using Mispollos.Configuration;
-using Mispollos.DataAccess;
-using Mispollos.Entities;
-using Mispollos.Models;
-using Mispollos.Utils;
+using Mispollos.Domain.Contracts.Services;
+using Mispollos.Domain.Entities;
+using Mispollos.Domain.Models;
 using MySql.Data.MySqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -25,26 +25,27 @@ namespace Mispollos.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly MisPollosContext _context = new MisPollosContext();
-        private readonly AppSettings _appSettings;
+        private readonly IUserService _service;
 
-        public UserController(IOptions<AppSettings> appSettings)
+        public UserController(IUserService service)
         {
-            _appSettings = appSettings.Value;
+            _service = service;
         }
 
         // Metodo traer lista de usuarios
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).OrderByDescending(x => x.UpdatedOn).Include(x => x.Tienda).Include(x => x.Rol).AsEnumerable() });
+            var result = await _service.GetUsers();
+            return Ok(result);
         }
 
         // GET: api/<UserController>
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public async Task<IActionResult> Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Include(x => x.Tienda).Include(x => x.Rol).Take(10).AsEnumerable(), total = _context.Usuarios.Where(x => x.Rol.Nombre == Role.User).Count() });
+            var result = await _service.GetUsersPaged(page, search);
+            return Ok(result);
         }
 
         // Traer un usuario por id
@@ -52,7 +53,7 @@ namespace Mispollos.Controllers
         [HttpGet("{id}")]
         public Usuario Get(Guid id)
         {
-            return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).FirstOrDefault(x => x.Id == id);
+            return _service.GetUserById(id);
         }
 
         // Traer un usuario por token
@@ -60,72 +61,52 @@ namespace Mispollos.Controllers
         [HttpGet("recuperar-clave/{token}")]
         public Usuario GetByToken(Guid token)
         {
-            return _context.Usuarios.Include(x => x.Tienda).Include(x => x.Rol).FirstOrDefault(x => x.Token == token);
+            return _service.GetUserByToken(token);
         }
 
-        // Crear usuario
+        //Crear usuario
         // POST api/user
         [HttpPost]
-        public IActionResult Post([FromBody] Usuario usuario)
+        public async Task<IActionResult> Post([FromBody] Usuario usuario)
         {
-            var userWithSameEmail = _context.Usuarios.FirstOrDefault(x => x.Correo == usuario.Correo);
+            Boolean repeatedEmail = _service.ValidateEmailExists(usuario.Correo);
 
-            if (userWithSameEmail == null)
+            if (!repeatedEmail)
             {
-                usuario.IdRol = _appSettings.IdRolAdmin;
-                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
-                usuario.CreatedOn = DateTime.Now;
-                var result = _context.Usuarios.Add(usuario);
-                _context.SaveChanges();
-                return Created("", result.Entity);
+                await _service.CreateUser(usuario);
+
+                return Ok();
             }
-            else
-            {
-                return BadRequest(new { message = "El correo ya esta en uso" });
-            }
+
+            return BadRequest(new { message = "El correo ya esta en uso" });
         }
 
         // POST api/<UserController>/empleado
-        [Authorize(Roles = Role.Admin)]
-        [HttpPost("empleado")]
-        public IActionResult PostEmpleado([FromBody] Usuario usuario)
+        //[Authorize(Roles = Role.Admin)]
+        //[HttpPost("empleado")]
+        public async Task<IActionResult> PostEmpleado([FromBody] Usuario usuario)
         {
-            var userWithSameEmail = _context.Usuarios.FirstOrDefault(x => x.Correo == usuario.Correo);
+            Boolean repeatedEmail = _service.ValidateEmailExists(usuario.Correo);
 
-            if (userWithSameEmail == null)
+            if (!repeatedEmail)
             {
-                usuario.IdRol = _appSettings.IdRolUser;
-                Guid token = Guid.NewGuid();
-                usuario.TokenExpiration = DateTime.Now.AddDays(1);
-                usuario.Token = token;
-                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
-                usuario.CreatedOn = DateTime.Now;
-                var result = _context.Usuarios.Add(usuario);
-                _context.SaveChanges();
+                await _service.CreateEmployee(usuario);
 
-                Email.send(usuario.Correo, token, "generatedPasswordEmail", "Tu cuenta en Mispollos ha sido creada");
-                return Created("", result.Entity);
+                return Ok();
             }
-            else
-            {
-                return BadRequest(new { message = "El correo ya esta en uso" });
-            }
+
+            return BadRequest(new { message = "El correo ya esta en uso" });
         }
 
         // POST api/user/recuperar-cuenta
-        [HttpPost("recuperar-cuenta")]
+        //[HttpPost("recuperar-cuenta")]
         public IActionResult PostRecuperarCuenta([FromBody] RecoverPasswordEmail email)
         {
-            var user = _context.Usuarios.FirstOrDefault(x => x.Correo == email.Email);
-            if (user != null)
-            {
-                user.TokenExpiration = DateTime.Now.AddDays(1);
-                user.Token = Guid.NewGuid();
-                var result = _context.Usuarios.Attach(user);
-                _context.Entry(user).State = EntityState.Modified;
-                _context.SaveChanges();
+            Boolean emailExists = _service.ValidateEmailExists(email.Email);
 
-                Email.send(user.Correo, user.Token, "recoverPasswordEmail", "Solicitud de recuperacion de contraseña");
+            if (emailExists)
+            {
+                _service.RecoverAccount(email);
                 return Ok();
             }
             return BadRequest(new { message = "El correo no existe" });
@@ -135,71 +116,27 @@ namespace Mispollos.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate(Authenticate model)
         {
-            model.Password = StringExtension.HashPassword(model.Password);
-
-            var user = _context.Usuarios.Include(x => x.Rol).FirstOrDefault(x => x.Correo == model.Email && x.Clave == model.Password);
-
-            Console.WriteLine(user);
+            Usuario user = _service.AuthenticateUser(model);
 
             if (user == null)
             {
                 return BadRequest(new { message = "El correo o clave son incorrectos" });
             }
 
-            #region Login Jwt
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Rol.Nombre)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            #endregion Login Jwt
+            AuthenticatedUserInfo authenticatedUserInfo = _service.GenerateJwt(user);
 
             // return basic user info and authentication token
-            return Ok(new
-            {
-                Id = user.Id,
-                Nombre = user.Nombre,
-                Apellido = user.Apellido,
-                Correo = user.Correo,
-                IdTienda = user.IdTienda,
-                rol = user.Rol.Nombre,
-                Token = tokenString
-            });
+            return Ok(authenticatedUserInfo);
         }
 
         // Actualizar usuario
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Usuario usuario)
+        public IActionResult Put(Usuario user)
         {
-            if (usuario.Clave != "")
-            {
-                usuario.Clave = StringExtension.HashPassword(usuario.Clave);
-            }
-            else
-            {
-                using (MisPollosContext context = new MisPollosContext())
-                {
-                    usuario.Clave = context.Usuarios.FirstOrDefault(x => x.Id == usuario.Id).Clave;
-                }
-            }
+            _service.UpdateUser(user);
 
-            var result = _context.Usuarios.Attach(usuario);
-            _context.Entry(usuario).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(result.Entity);
+            return Ok();
         }
 
         // Borrar usuario
@@ -207,13 +144,7 @@ namespace Mispollos.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
-            var usuario = _context.Usuarios.FirstOrDefault(x => x.Id == id);
-            if (_context.Entry(usuario).State == EntityState.Detached)
-            {
-                _context.Usuarios.Attach(usuario);
-            }
-            _context.Usuarios.Remove(usuario);
-            _context.SaveChanges();
+            _service.DeleteUser(id);
         }
     }
 }

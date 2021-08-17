@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mispollos.Configuration;
-using Mispollos.DataAccess;
-using Mispollos.Entities;
+using Mispollos.Domain.Contracts.Services;
+using Mispollos.Domain.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,55 +18,57 @@ namespace Mispollos.Controllers
     [Authorize]
     public class ClienteController : ControllerBase
     {
-        private readonly MisPollosContext _context = new MisPollosContext();
+        private readonly ICustomerService _service;
+
+        public ClienteController(ICustomerService service)
+        {
+            _service = service;
+        }
 
         // Metodo traer lista de clientes
 
         // GET: api/<ClienteController>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(new { data = _context.Cliente.OrderBy(x => x.Nombre).AsEnumerable() });
+            var result = await _service.GetCustomers();
+            return Ok(result);
         }
 
         // GET: api/<ClienteController>/p/{page}
 
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public async Task<IActionResult> Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Cliente.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Take(10).AsEnumerable(), total = _context.Cliente.Count() });
+            var result = await _service.GetCustomersPaged(page, search);
+            return Ok(result);
         }
 
         // Traer un cliente por id
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public Cliente Get(Guid id)
+        public async Task<Cliente> Get(Guid id)
         {
-            return _context.Cliente.FirstOrDefault(x => x.Id == id);
+            return await _service.GetCustomerById(id);
         }
 
         // Crear cliente
         // POST api/<ClienteController>
         [HttpPost]
-        public IActionResult Post([FromBody] Cliente cliente)
+        public async Task<IActionResult> Post([FromBody] Cliente customer)
         {
-            cliente.CreatedOn = DateTime.Now;
-            var result = _context.Cliente.Add(cliente);
-            _context.SaveChanges();
-
-            return Created("", result.Entity);
+            var result = await _service.CreateCustomer(customer);
+            return Ok(result);
         }
 
         // Actualizar usuario
         // PUT api/<ClienteController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Cliente cliente)
+        public IActionResult Put(Cliente customer)
         {
-            var result = _context.Cliente.Attach(cliente);
-            _context.Entry(cliente).State = EntityState.Modified;
-            _context.SaveChanges();
+            _service.UpdateCustomer(customer);
 
-            return Ok(result.Entity);
+            return Ok();
         }
 
         // Borrar usuario
@@ -74,13 +76,7 @@ namespace Mispollos.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
-            var cliente = _context.Cliente.FirstOrDefault(x => x.Id == id);
-            if (_context.Entry(cliente).State == EntityState.Detached)
-            {
-                _context.Cliente.Attach(cliente);
-            }
-            _context.Cliente.Remove(cliente);
-            _context.SaveChanges();
+            _service.DeleteCustomer(id);
         }
     }
 }

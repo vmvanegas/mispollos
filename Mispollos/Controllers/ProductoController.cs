@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mispollos.DataAccess;
-using Mispollos.Entities;
+using Mispollos.Domain.Contracts.Services;
+using Mispollos.Domain.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,55 +17,59 @@ namespace Mispollos.Controllers
     [Authorize]
     public class ProductoController : ControllerBase
     {
-        private readonly MisPollosContext _context = new MisPollosContext();
+        //private readonly MisPollosContext _context = new MisPollosContext();
 
         // Metodo traer lista de usuarios
 
         // GET: api/<ProductoController>
-        [HttpGet]
-        public IActionResult Get()
+
+        private readonly IProductService _service;
+
+        public ProductoController(IProductService service)
         {
-            return Ok(new { data = _context.Producto.OrderBy(x => x.Nombre).AsEnumerable() });
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _service.GetProducts();
+            return Ok(result);
         }
 
         // GET: api/<ProductoController>/p/{page}
 
         [HttpGet("p/{page}")]
-        public IActionResult Get(int page)
+        public async Task<IActionResult> Get(int page, string search = null)
         {
-            return Ok(new { data = _context.Producto.OrderByDescending(x => x.UpdatedOn).Skip((page - 1) * 10).Include(x => x.Proveedor).Include(x => x.Categoria).Take(10).AsEnumerable(), total = _context.Producto.Count() });
+            var result = await _service.GetProductsPaged(page, search);
+            return Ok(result);
         }
 
         // Traer un usuario por id
         // GET api/<ProductoController>/5
         [HttpGet("{id}")]
-        public Producto Get(Guid id)
+        public async Task<Producto> Get(Guid id)
         {
-            return _context.Producto.Include(x => x.Proveedor).Include(x => x.Categoria).FirstOrDefault(x => x.Id == id);
+            return await _service.GetProductById(id);
         }
 
         // Crear usuario
         // POST api/<ProductoController>
         [HttpPost]
-        public IActionResult Post([FromBody] Producto producto)
+        public async Task<IActionResult> Post([FromBody] Producto product)
         {
-            producto.CreatedOn = DateTime.Now;
-            var result = _context.Producto.Add(producto);
-            _context.SaveChanges();
-
-            return Created("", result.Entity);
+            var result = await _service.CreateProduct(product);
+            return Ok(result);
         }
 
         // Actualizar usuario
         // PUT api/<ProductoController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Producto producto)
+        public IActionResult Put(Producto product)
         {
-            var result = _context.Producto.Attach(producto);
-            _context.Entry(producto).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(result.Entity);
+            _service.UpdateProduct(product);
+            return Ok();
         }
 
         // Borrar usuario
@@ -73,13 +77,7 @@ namespace Mispollos.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
-            var producto = _context.Producto.FirstOrDefault(x => x.Id == id);
-            if (_context.Entry(producto).State == EntityState.Detached)
-            {
-                _context.Producto.Attach(producto);
-            }
-            _context.Producto.Remove(producto);
-            _context.SaveChanges();
+            _service.DeleteProduct(id);
         }
     }
 }

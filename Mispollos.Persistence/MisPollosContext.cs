@@ -24,8 +24,9 @@ namespace Mispollos.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.EnableSensitiveDataLogging();
         }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region ModuleSeed

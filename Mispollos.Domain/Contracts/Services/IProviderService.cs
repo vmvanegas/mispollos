@@ -17,8 +17,8 @@ namespace Mispollos.Domain.Contracts.Services
 
         Task<Proveedor> CreateProvider(Proveedor provider);
 
-        void UpdateProvider(Proveedor provider);
+        Task UpdateProvider(Proveedor provider);
 
-        void DeleteProvider(Guid id);
+        Task DeleteProvider(Guid id);
     }
 }

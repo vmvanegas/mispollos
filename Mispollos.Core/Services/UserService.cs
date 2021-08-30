@@ -85,15 +85,14 @@ namespace Mispollos.Application.Services
 
         public async Task UpdateUser(Usuario user)
         {
-            if (string.IsNullOrEmpty(user.Clave))
+            if (!string.IsNullOrEmpty(user.Clave))
             {
                 user.Clave = StringExtension.HashPassword(user.Clave);
             }
             else
             {
-                user.Clave = (await _userRepository.GetByIdAsync(user.Id)).Clave;
+                user.Clave = _userRepository.Query(x => x.Id == user.Id).AsNoTracking().FirstOrDefault().Clave;
             }
-
             await _userRepository.UpdateAsync(user);
         }
 

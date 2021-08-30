@@ -65,14 +65,14 @@ namespace Mispollos.Application.Services
             return await _customerRepository.AddAsync(customer);
         }
 
-        public void UpdateCustomer(Cliente customer)
+        public async Task UpdateCustomer(Cliente customer)
         {
-            _customerRepository.UpdateAsync(customer);
+            await _customerRepository.UpdateAsync(customer);
         }
 
-        public void DeleteCustomer(Guid id)
+        public async Task DeleteCustomer(Guid id)
         {
-            _customerRepository.DeleteAsync(id);
+            await _customerRepository.DeleteAsync(id);
         }
     }
 }

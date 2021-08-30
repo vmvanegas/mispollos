@@ -66,14 +66,14 @@ namespace Mispollos.Application.Services
             return await _productRepository.AddAsync(product);
         }
 
-        public void UpdateProduct(Producto product)
+        public async Task UpdateProduct(Producto product)
         {
-            _productRepository.UpdateAsync(product);
+            await _productRepository.UpdateAsync(product);
         }
 
-        public void DeleteProduct(Guid id)
+        public async Task DeleteProduct(Guid id)
         {
-            _productRepository.DeleteAsync(id);
+            await _productRepository.DeleteAsync(id);
         }
     }
 }

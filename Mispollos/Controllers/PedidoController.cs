@@ -63,18 +63,19 @@ namespace Mispollos.Controllers
         // Actualizar pedido
         // PUT api/<PedidoController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(PedidoDto dto)
+        public async Task<IActionResult> Put(PedidoDto dto)
         {
-            _service.UpdateOrder(dto);
+            await _service.UpdateOrder(dto);
             return Ok();
         }
 
         // Borrar pedido
         // DELETE api/<PedidoController>/5
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteOrder(id);
+            await _service.DeleteOrder(id);
+            return Ok();
         }
     }
 }

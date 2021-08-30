@@ -132,9 +132,9 @@ namespace Mispollos.Controllers
         // Actualizar usuario
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Usuario user)
+        public async Task<IActionResult> Put(Usuario user)
         {
-            _service.UpdateUser(user);
+            await _service.UpdateUser(user);
 
             return Ok();
         }
@@ -142,9 +142,10 @@ namespace Mispollos.Controllers
         // Borrar usuario
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteUser(id);
+            await _service.DeleteUser(id);
+            return Ok();
         }
     }
 }

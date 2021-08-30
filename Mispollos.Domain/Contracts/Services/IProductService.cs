@@ -17,8 +17,8 @@ namespace Mispollos.Domain.Contracts.Services
 
         Task<Producto> CreateProduct(Producto product);
 
-        void UpdateProduct(Producto product);
+        Task UpdateProduct(Producto product);
 
-        void DeleteProduct(Guid id);
+        Task DeleteProduct(Guid id);
     }
 }

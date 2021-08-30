@@ -17,8 +17,8 @@ namespace Mispollos.Domain.Contracts.Services
 
         Task<Cliente> CreateCustomer(Cliente customer);
 
-        void UpdateCustomer(Cliente customer);
+        Task UpdateCustomer(Cliente customer);
 
-        void DeleteCustomer(Guid id);
+        Task DeleteCustomer(Guid id);
     }
 }

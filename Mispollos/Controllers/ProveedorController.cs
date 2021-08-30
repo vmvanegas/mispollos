@@ -64,9 +64,9 @@ namespace Mispollos.Controllers
         // Actualizar proveedor
         // PUT api/<ProveedorController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Proveedor provider)
+        public async Task<IActionResult> Put(Proveedor provider)
         {
-            _service.UpdateProvider(provider);
+            await _service.UpdateProvider(provider);
 
             return Ok();
         }
@@ -74,9 +74,10 @@ namespace Mispollos.Controllers
         // Borrar proveedor
         // DELETE api/<ProveedorController>/5
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteProvider(id);
+            await _service.DeleteProvider(id);
+            return Ok();
         }
     }
 }

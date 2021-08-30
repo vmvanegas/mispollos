@@ -18,7 +18,7 @@ namespace Mispollos.Application.Services
             return await _orderItem.AddAsync(orderItem);
         }
 
-        public void DeleteOrderItem(Guid id)
+        public async Task DeleteOrderItem(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -38,7 +38,7 @@ namespace Mispollos.Application.Services
             throw new NotImplementedException();
         }
 
-        public void UpdateOrderItem(PedidoProducto orderItem)
+        public async Task UpdateOrderItem(PedidoProducto orderItem)
         {
             throw new NotImplementedException();
         }

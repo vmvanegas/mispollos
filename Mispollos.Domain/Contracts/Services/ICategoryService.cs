@@ -18,8 +18,8 @@ namespace Mispollos.Domain.Contracts.Services
 
         Task<Categoria> CreateCategory(Categoria category);
 
-        void UpdateCategory(Categoria category);
+        Task UpdateCategory(Categoria category);
 
-        void DeleteCategory(Guid id);
+        Task DeleteCategory(Guid id);
     }
 }

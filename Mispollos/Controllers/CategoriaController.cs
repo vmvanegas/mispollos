@@ -64,9 +64,9 @@ namespace Mispollos.Controllers
         //// Actualizar categoria
         //// PUT api/<CateogoriaController>/{id}
         [HttpPut("{id}")]
-        public IActionResult Put(Categoria categoria)
+        public async Task<IActionResult> Put(Categoria categoria)
         {
-            _service.UpdateCategory(categoria);
+            await _service.UpdateCategory(categoria);
 
             return Ok();
         }
@@ -74,9 +74,11 @@ namespace Mispollos.Controllers
         //// Borrar categoria
         //// DELETE api/<CateogoriaController>/{id}
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteCategory(id);
+            await _service.DeleteCategory(id);
+
+            return Ok();
         }
     }
 }

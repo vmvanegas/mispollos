@@ -64,14 +64,14 @@ namespace Mispollos.Application.Services
             return await _categoryRepository.AddAsync(category);
         }
 
-        public void UpdateCategory(Categoria category)
+        public async Task UpdateCategory(Categoria category)
         {
-            _categoryRepository.UpdateAsync(category);
+            await _categoryRepository.UpdateAsync(category);
         }
 
-        public void DeleteCategory(Guid id)
+        public async Task DeleteCategory(Guid id)
         {
-            _categoryRepository.DeleteAsync(id);
+            await _categoryRepository.DeleteAsync(id);
         }
     }
 }

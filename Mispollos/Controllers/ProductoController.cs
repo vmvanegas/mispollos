@@ -66,18 +66,19 @@ namespace Mispollos.Controllers
         // Actualizar usuario
         // PUT api/<ProductoController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Producto product)
+        public async Task<IActionResult> Put(Producto product)
         {
-            _service.UpdateProduct(product);
+            await _service.UpdateProduct(product);
             return Ok();
         }
 
         // Borrar usuario
         // DELETE api/<ProductoController>/5
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteProduct(id);
+            await _service.DeleteProduct(id);
+            return Ok();
         }
     }
 }

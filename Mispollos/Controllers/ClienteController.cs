@@ -64,9 +64,9 @@ namespace Mispollos.Controllers
         // Actualizar usuario
         // PUT api/<ClienteController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(Cliente customer)
+        public async Task<IActionResult> Put(Cliente customer)
         {
-            _service.UpdateCustomer(customer);
+            await _service.UpdateCustomer(customer);
 
             return Ok();
         }
@@ -74,9 +74,10 @@ namespace Mispollos.Controllers
         // Borrar usuario
         // DELETE api/<ClienteController>/5
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            _service.DeleteCustomer(id);
+            await _service.DeleteCustomer(id);
+            return Ok();
         }
     }
 }

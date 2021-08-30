@@ -17,8 +17,8 @@ namespace Mispollos.Domain.Contracts.Services
 
         Task<PedidoProducto> CreateOrderItem(PedidoProducto orderItem);
 
-        void UpdateOrderItem(PedidoProducto orderItem);
+        Task UpdateOrderItem(PedidoProducto orderItem);
 
-        void DeleteOrderItem(Guid id);
+        Task DeleteOrderItem(Guid id);
     }
 }

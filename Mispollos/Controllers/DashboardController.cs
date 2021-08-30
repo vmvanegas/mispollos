@@ -40,7 +40,7 @@ namespace Mispollos.Controllers
         [HttpGet("best-selling-product")]
         public IActionResult bestSellingProduct()
         {
-            Producto product = _service.BestSellingProduct();
+            var product = _service.BestSellingProduct();
 
             return Ok(product);
         }
@@ -48,7 +48,7 @@ namespace Mispollos.Controllers
         [HttpGet("least-sold-product")]
         public IActionResult leastSoldProduct()
         {
-            Producto product = _service.LeastSoldProduct();
+            var product = _service.LeastSoldProduct();
 
             return Ok(product);
         }
@@ -66,6 +66,30 @@ namespace Mispollos.Controllers
         {
             Producto product = _service.LowStock();
             return Ok(product);
+        }
+
+        [HttpGet("total-orders")]
+        public IActionResult TotalOrders()
+        {
+            return Ok(_service.TotalOrders());
+        }
+
+        [HttpGet("total-customers")]
+        public IActionResult TotalCustomers()
+        {
+            return Ok(_service.TotalCustomers());
+        }
+
+        [HttpGet("total-providers")]
+        public IActionResult TotalProviders()
+        {
+            return Ok(_service.TotalProviders());
+        }
+
+        [HttpGet("total-employees")]
+        public IActionResult TotalEmployees()
+        {
+            return Ok(_service.TotalEmployees());
         }
     }
 }

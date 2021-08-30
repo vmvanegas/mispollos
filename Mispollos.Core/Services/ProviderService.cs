@@ -64,14 +64,14 @@ namespace Mispollos.Application.Services
             return await _providerRepository.AddAsync(provider);
         }
 
-        public void UpdateProvider(Proveedor provider)
+        public async Task UpdateProvider(Proveedor provider)
         {
-            _providerRepository.UpdateAsync(provider);
+            await _providerRepository.UpdateAsync(provider);
         }
 
-        public void DeleteProvider(Guid id)
+        public async Task DeleteProvider(Guid id)
         {
-            _providerRepository.DeleteAsync(id);
+            await _providerRepository.DeleteAsync(id);
         }
     }
 }

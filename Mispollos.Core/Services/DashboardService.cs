@@ -14,15 +14,21 @@ namespace Mispollos.Application.Services
     internal class DashboardService : IDashboardService
     {
         private readonly IAsyncRepository<Pedido> _orderService;
+        private readonly IAsyncRepository<Cliente> _customerService;
+        private readonly IAsyncRepository<Proveedor> _providerService;
+        private readonly IAsyncRepository<Usuario> _userService;
         private readonly IAsyncRepository<Producto> _productService;
 
-        public DashboardService(IAsyncRepository<Pedido> orderService, IAsyncRepository<Producto> productService)
+        public DashboardService(IAsyncRepository<Pedido> orderService, IAsyncRepository<Cliente> customerService, IAsyncRepository<Proveedor> providerService, IAsyncRepository<Usuario> userService, IAsyncRepository<Producto> productService)
         {
             _orderService = orderService;
+            _customerService = customerService;
+            _providerService = providerService;
+            _userService = userService;
             _productService = productService;
         }
 
-        public Producto BestSellingProduct()
+        public List<TopSellingProducts> BestSellingProduct()
         {
             var product = _orderService.Query()
                 .Include("PedidoProducto.Producto")
@@ -31,8 +37,7 @@ namespace Mispollos.Application.Services
                 .AsEnumerable()
                 .GroupBy(x => x.IdProducto)
                 .OrderByDescending(x => x.Sum(y => y.Cantidad))
-                .FirstOrDefault()?
-                .FirstOrDefault().Producto;
+                .Take(5).Select(x => new TopSellingProducts { Product = x.FirstOrDefault().Producto, Quantity = x.Sum(y => y.Cantidad) }).ToList();
 
             return product;
         }
@@ -43,12 +48,15 @@ namespace Mispollos.Application.Services
             return product;
         }
 
-        public Producto LeastSoldProduct()
+        public List<TopSellingProducts> LeastSoldProduct()
         {
             var product = _orderService.Query()
+                .Include("PedidoProducto.Producto")
                 .Where(x => x.Fecha > DateTime.Now.AddDays(-7))
-                .SelectMany(x => x.PedidoProducto).AsEnumerable().GroupBy(x => x.IdProducto)
-                .OrderByDescending(x => x.Sum(y => y.Cantidad)).LastOrDefault()?.FirstOrDefault().Producto;
+                .SelectMany(x => x.PedidoProducto).AsEnumerable()
+                .GroupBy(x => x.IdProducto)
+                .OrderBy(x => x.Sum(y => y.Cantidad))
+                .Take(5).Select(x => new TopSellingProducts { Product = x.FirstOrDefault().Producto, Quantity = x.Sum(y => y.Cantidad) }).ToList();
 
             return product;
         }
@@ -115,6 +123,26 @@ namespace Mispollos.Application.Services
             };
 
             return chartDto;
+        }
+
+        public int TotalOrders()
+        {
+            return _orderService.Query().Count();
+        }
+
+        public int TotalCustomers()
+        {
+            return _customerService.Query().Count();
+        }
+
+        public int TotalProviders()
+        {
+            return _providerService.Query().Count();
+        }
+
+        public int TotalEmployees()
+        {
+            return _userService.Query(x => x.Rol.Nombre == "Usuario").Count();
         }
     }
 }

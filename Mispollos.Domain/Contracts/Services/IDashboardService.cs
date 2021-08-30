@@ -13,12 +13,20 @@ namespace Mispollos.Domain.Contracts.Services
 
         SalesPercentageDto SalesPercentage();
 
-        Producto BestSellingProduct();
+        List<TopSellingProducts> BestSellingProduct();
 
-        Producto LeastSoldProduct();
+        List<TopSellingProducts> LeastSoldProduct();
 
         Producto CloseDueDate();
 
         Producto LowStock();
+
+        int TotalOrders();
+
+        int TotalCustomers();
+
+        int TotalProviders();
+
+        int TotalEmployees();
     }
 }

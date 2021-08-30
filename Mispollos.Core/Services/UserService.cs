@@ -20,7 +20,6 @@ namespace Mispollos.Application.Services
     public class UserService : IUserService
     {
         private readonly IAsyncRepository<Usuario> _userRepository;
-        private EmailService _emailService;
         private readonly AppSettings _appSettings;
 
         public UserService(IAsyncRepository<Usuario> userRepository, IOptions<AppSettings> appSettings)
@@ -115,7 +114,8 @@ namespace Mispollos.Application.Services
             user.Clave = StringExtension.HashPassword(user.Clave);
             user.CreatedOn = DateTime.Now;
             await _userRepository.AddAsync(user);
-            _emailService.Send(user.Correo, token, "generatedPasswordEmail", "Tu cuenta en Mispollos ha sido creada");
+            EmailService emailService = new EmailService();
+            emailService.Send(user.Correo, token, "generatedPasswordEmail", "Tu cuenta en Mispollos ha sido creada");
         }
 
         public async Task RecoverAccount(RecoverPasswordEmail email)
@@ -124,7 +124,8 @@ namespace Mispollos.Application.Services
             user.TokenExpiration = DateTime.Now.AddDays(1);
             user.Token = Guid.NewGuid();
             await _userRepository.UpdateAsync(user);
-            _emailService.Send(user.Correo, user.Token, "recoverPasswordEmail", "Solicitud de recuperacion de contraseña");
+            EmailService emailService = new EmailService();
+            emailService.Send(user.Correo, user.Token, "recoverPasswordEmail", "Solicitud de recuperacion de contraseña");
         }
 
         public Usuario AuthenticateUser(Authenticate userCredentials)

@@ -82,8 +82,8 @@ namespace Mispollos.Controllers
         }
 
         // POST api/<UserController>/empleado
-        //[Authorize(Roles = Role.Admin)]
-        //[HttpPost("empleado")]
+        [Authorize(Roles = Role.Admin)]
+        [HttpPost("empleado")]
         public async Task<IActionResult> PostEmpleado([FromBody] Usuario usuario)
         {
             Boolean repeatedEmail = _service.ValidateEmailExists(usuario.Correo);
@@ -99,7 +99,7 @@ namespace Mispollos.Controllers
         }
 
         // POST api/user/recuperar-cuenta
-        //[HttpPost("recuperar-cuenta")]
+        [HttpPost("recuperar-cuenta")]
         public IActionResult PostRecuperarCuenta([FromBody] RecoverPasswordEmail email)
         {
             Boolean emailExists = _service.ValidateEmailExists(email.Email);

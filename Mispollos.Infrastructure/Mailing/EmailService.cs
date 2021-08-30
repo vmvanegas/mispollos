@@ -15,8 +15,7 @@ namespace Mispollos.Infrastructure.Utils
             string emailOrigen = "mispollos.oficial@gmail.com";
             string password = "mi$po11o$";
             string body = "";
-
-            using (StreamReader reader = File.OpenText($"html\\{template}.html"))
+            using (StreamReader reader = File.OpenText($"..\\Mispollos.Infrastructure\\Mailing\\html\\{template}.html"))
             {
                 body = reader.ReadToEnd();
                 body = body.Replace("{{EMAIL}}", emailDestino).Replace("{{TOKEN}}", token.ToString());

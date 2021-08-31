@@ -100,13 +100,13 @@ namespace Mispollos.Controllers
 
         // POST api/user/recuperar-cuenta
         [HttpPost("recuperar-cuenta")]
-        public IActionResult PostRecuperarCuenta([FromBody] RecoverPasswordEmail email)
+        public async Task<IActionResult> PostRecuperarCuenta([FromBody] RecoverPasswordEmail email)
         {
             Boolean emailExists = _service.ValidateEmailExists(email.Email);
 
             if (emailExists)
             {
-                _service.RecoverAccount(email);
+                await _service.RecoverAccount(email);
                 return Ok();
             }
             return BadRequest(new { message = "El correo no existe" });

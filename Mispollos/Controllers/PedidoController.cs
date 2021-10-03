@@ -46,9 +46,9 @@ namespace Mispollos.Controllers
         // Traer un pedido por id
         // GET api/<PedidoController>/5
         [HttpGet("{id}")]
-        public async Task<Pedido> Get(Guid id)
+        public Pedido Get(Guid id)
         {
-            return await _service.GetOrderById(id);
+            return _service.GetOrderById(id);
         }
 
         // Crear pedido

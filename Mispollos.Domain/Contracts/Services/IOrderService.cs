@@ -11,7 +11,7 @@ namespace Mispollos.Domain.Contracts.Services
     {
         Task<List<Pedido>> GetOrders();
 
-        Task<Pedido> GetOrderById(Guid id);
+        Pedido GetOrderById(Guid id);
 
         Task<PagedResult<Pedido>> GetOrdersPaged(int page, string search);
 

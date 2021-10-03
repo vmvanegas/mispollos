@@ -54,6 +54,13 @@ namespace Mispollos.Domain.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task DeleteCompositeAsync(Guid id, Guid secondKey)
+        {
+            T entity = await _dbContext.Set<T>().FindAsync(id, secondKey);
+            _dbContext.Set<T>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task DisposeAsync()
         {
             await _dbContext.DisposeAsync();

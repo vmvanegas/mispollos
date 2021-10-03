@@ -27,6 +27,8 @@ namespace Mispollos.Domain.Contracts.Repositories
 
         Task DeleteAsync(Guid id);
 
+        Task DeleteCompositeAsync(Guid id, Guid secondKey);
+
         Task DisposeAsync();
     }
 }

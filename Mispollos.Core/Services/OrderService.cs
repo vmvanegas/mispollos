@@ -59,9 +59,9 @@ namespace Mispollos.Application.Services
             return result;
         }
 
-        public async Task<Pedido> GetOrderById(Guid id)
+        public Pedido GetOrderById(Guid id)
         {
-            return await _orderRepository.GetByIdAsync(id);
+            return _orderRepository.Query().Include(x => x.PedidoProducto).FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Pedido> CreateOrder(PedidoDto dto)
@@ -132,7 +132,7 @@ namespace Mispollos.Application.Services
 
             await _orderRepository.UpdateAsync(pedido);
 
-            var productitems = _orderItemRepository.Query(x => x.IdPedido == pedido.Id);
+            var productitems = _orderItemRepository.Query(x => x.IdPedido == pedido.Id).ToList();
 
             foreach (var productitem in productitems)
             {
@@ -142,7 +142,7 @@ namespace Mispollos.Application.Services
                     product.Stock += productitem.Cantidad;
                     await _productRepository.UpdateAsync(product);
 
-                    await _orderItemRepository.DeleteAsync(productitem.IdPedido);
+                    await _orderItemRepository.DeleteCompositeAsync(productitem.IdPedido, productitem.IdProducto);
                 }
             }
 
